@@ -1,4 +1,24 @@
 services:
+  app:
+    build:
+      dockerfile: ./Dockerfile
+      context: .
+      target: dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USERNAME=cicd
+      - DB_PASSWORD=qqqq1111
+      - DB_DATABASE=cicd
+
   db:
     image: mysql:8.1.0-oracle
     environment:
@@ -8,6 +28,7 @@ services:
       - MYSQL_DATABASE=cicd
     volumes:
       - db:/var/lib/mysql
+      - ./healthchecks:/healthchecks
     healthcheck:
       test: /healthchecks/mysql-healthcheck
       interval: "5s"
