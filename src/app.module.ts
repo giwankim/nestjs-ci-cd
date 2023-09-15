@@ -18,11 +18,11 @@ import * as Joi from 'joi';
           .valid('development', 'production', 'staging')
           .default('development'),
         PORT: Joi.number().default(3000),
-        DB_HOST: Joi.string().required(),
-        DB_PORT: Joi.number().required(),
-        DB_USERNAME: Joi.string().required(),
-        DB_PASSWORD: Joi.string().required(),
-        DB_DATABASE: Joi.string().required(),
+        POSTGRES_HOST: Joi.string().required(),
+        POSTGRES_PORT: Joi.number().required(),
+        POSTGRES_USER: Joi.string().required(),
+        POSTGRES_PASSWORD: Joi.string().required(),
+        POSTGRES_DB: Joi.string().required(),
       }),
       load: [databaseConfig],
     }),
@@ -30,7 +30,7 @@ import * as Joi from 'joi';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
         return {
-          type: 'mysql',
+          type: 'postgres',
           host: configService.get<string>('database.host'),
           port: configService.get<number>('database.port'),
           username: configService.get<string>('database.username'),

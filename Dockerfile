@@ -1,11 +1,13 @@
-FROM node:18-bookworm-slim AS base
+FROM node:18.17.1-bookworm-slim AS base
 ENV NODE_ENV=production
 RUN apt-get update \
     && apt-get -qq install -y --no-install-recommends \
     tini \
     tzdata \
     && rm -rf /var/lib/apt/lists/* \
+# Locale Setting
 ENV LC_ALL C.UTF-8
+# Set timezone
 ENV TZ=Asia/Seoul
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone \
@@ -21,13 +23,13 @@ FROM base AS dev
 ENV NODE_ENV=development
 ENV PATH=/app/node_modules/.bin:$PATH
 RUN npm install && npm cache clean --force
-CMD [ "nest", "start", "--watch" ]
+CMD [ "npm", "run", "start:dev" ]
 
 FROM base AS build
 COPY --chown=node:node . .
-RUN nest build
+RUN npm run build
 
 FROM base AS prod
-COPY --from=build /app/dist .
+COPY --from=build /app/dist ./dist
 ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["node", "./main.js"]
+CMD ["node", "./dist/main.js"]

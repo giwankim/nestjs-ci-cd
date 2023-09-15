@@ -8,32 +8,23 @@ services:
       - .:/app
       - /app/node_modules
     ports:
-      - "3000"
+      - "3000:3000"
     depends_on:
       db:
         condition: service_healthy
-    environment:
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_USERNAME=cicd
-      - DB_PASSWORD=qqqq1111
-      - DB_DATABASE=cicd
+    env_file:
+      - .env.docker
 
   db:
-    image: mysql:8.1.0-oracle
-    environment:
-      - MYSQL_RANDOM_ROOT_PASSWORD=yes
-      - MYSQL_USER=cicd
-      - MYSQL_PASSWORD=qqqq1111
-      - MYSQL_DATABASE=cicd
+    image: postgres:15.4-bookworm
     volumes:
-      - db:/var/lib/mysql
+      - db:/var/lib/postgresql/data
       - ./healthchecks:/healthchecks
     healthcheck:
-      test: /healthchecks/mysql-healthcheck
+      test: /healthchecks/postgres-healthcheck
       interval: "5s"
-    ports:
-      - "3306:3306"
+    env_file:
+      - .env.docker
 
 volumes:
   db:
