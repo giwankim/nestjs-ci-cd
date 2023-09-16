@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { HealthModule } from './health/health.module';
@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import databaseConfig from './config/database.config';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import * as Joi from 'joi';
+import { LoggerModule } from 'nestjs-pino';
 
 @Module({
   imports: [
@@ -42,6 +43,21 @@ import * as Joi from 'joi';
           logging: process.env.NODE_ENV === 'development',
         };
       },
+    }),
+    LoggerModule.forRoot({
+      pinoHttp: {
+        customProps: () => ({
+          context: 'HTTP',
+        }),
+        serializers: {
+          req(req) {
+            req.body = req.raw.body;
+            return req;
+          },
+        },
+        level: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',
+      },
+      exclude: [{ path: 'health', method: RequestMethod.ALL }],
     }),
   ],
   controllers: [AppController],
