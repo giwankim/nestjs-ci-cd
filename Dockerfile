@@ -25,7 +25,7 @@ ENV PATH=/app/node_modules/.bin:$PATH
 RUN npm install && npm cache clean --force
 CMD [ "npm", "run", "start:dev" ]
 
-FROM base AS build
+FROM dev AS build
 COPY --chown=node:node . .
 RUN npm run build
 
