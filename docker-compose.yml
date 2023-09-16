@@ -1,0 +1,30 @@
+services:
+  app:
+    build:
+      dockerfile: ./Dockerfile
+      context: .
+      target: dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env.docker
+
+  db:
+    image: postgres:15.4-bookworm
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./healthchecks:/healthchecks
+    healthcheck:
+      test: /healthchecks/postgres-healthcheck
+      interval: "5s"
+    env_file:
+      - .env.docker
+
+volumes:
+  db:
