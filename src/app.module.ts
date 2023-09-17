@@ -41,6 +41,7 @@ import { LoggerModule } from 'nestjs-pino';
           autoLoadEntities: true,
           synchronize: process.env.NODE_ENV === 'development',
           logging: process.env.NODE_ENV === 'development',
+          extra: { ssl: { rejectUnauthorized: false } },
         };
       },
     }),
